@@ -1,0 +1,53 @@
+---
+import BlogLayout from '../../../layouts/BlogLayout.astro';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Get parameters from URL
+const { lang, type, slug } = Astro.params;
+
+// Construct file path
+const contentDir = path.join(process.cwd(), 'src', 'content', type, lang);
+const filePath = path.join(contentDir, `${slug}.md`);
+
+// Read markdown file
+let frontmatter = {};
+let content = '';
+
+try {
+  const fileContent = fs.readFileSync(filePath, 'utf-8');
+
+  // Extract frontmatter
+  const frontmatterMatch = fileContent.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+
+  if (frontmatterMatch) {
+    const frontmatterText = frontmatterMatch[1];
+    content = frontmatterMatch[2];
+
+    // Parse frontmatter (simple parser)
+    frontmatterText.split('\n').forEach(line => {
+      const [key, ...valueParts] = line.split(':');
+      if (key && valueParts.length > 0) {
+        const value = valueParts.join(':').trim().replace(/^["']|["']$/g, '');
+        frontmatter[key.trim()] = value;
+      }
+    });
+  }
+} catch (error) {
+  return Astro.redirect('/404');
+}
+---
+
+<BlogLayout
+  title={frontmatter.title}
+  description={frontmatter.description}
+  publishedAt={frontmatter.publishedAt}
+  imageUrl={frontmatter.imageUrl}
+  language={lang}
+>
+  <article set:html={content} />
+</BlogLayout>
