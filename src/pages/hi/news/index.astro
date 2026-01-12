@@ -1,0 +1,40 @@
+---
+import { readdir } from "node:fs/promises";
+import path from "node:path";
+
+const dir = path.join(process.cwd(), "src", "content", "news", "hi");
+
+let slugs = [];
+try {
+  const files = await readdir(dir);
+  slugs = files
+    .filter((f) => f.endsWith(".md"))
+    .map((f) => f.replace(/\.md$/, ""))
+    .sort()
+    .reverse();
+} catch (_) {
+  slugs = [];
+}
+---
+
+<!doctype html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>हिंदी समाचार</title>
+</head>
+<body style="font-family: system-ui; max-width: 900px; margin: 0 auto; padding: 20px;">
+  <h1>हिंदी समाचार</h1>
+
+  {slugs.length === 0 ? (
+    <p>अभी कोई पोस्ट नहीं है। (Cloud Functions जल्द ही markdown push करेगा।)</p>
+  ) : (
+    <ul>
+      {slugs.map((s) => <li><a href={`/hi/news/${s}/`}>{s}</a></li>)}
+    </ul>
+  )}
+
+  <p><a href="/">← Home</a></p>
+</body>
+</html>
