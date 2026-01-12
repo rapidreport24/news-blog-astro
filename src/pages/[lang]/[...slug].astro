@@ -1,79 +1,48 @@
-
 ---
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import BlogLayout from "../../layouts/BlogLayout.astro";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Normalize route params
+const lang = Astro.params.lang || 'en'; // fallback if missing
+const type = Astro.params.type || 'news'; // fallback if missing
 
-export async function getStaticPaths() {
-  // Loop through all content files for all languages/types
-  const contentDir = path.join(process.cwd(), 'src', 'content');
-  const paths = [];
+// slug can be string or array
+const slugArray = Array.isArray(Astro.params.slug)
+  ? Astro.params.slug
+  : (Astro.params.slug ? [Astro.params.slug] : ['index']); // fallback 'index'
 
-  const types = fs.readdirSync(contentDir); // news, stories, history
-  for (const type of types) {
-    const langsDir = path.join(contentDir, type);
-    const langs = fs.readdirSync(langsDir); // en, hi
-    for (const lang of langs) {
-      const files = fs.readdirSync(path.join(langsDir, lang));
-      for (const file of files) {
-        if (file.endsWith('.md')) {
-          const slug = file.replace('.md', '');
-          paths.push({
-            params: { lang, type, slug },
-          });
-        }
-      }
-    }
-  }
-
-  return paths;
-}
-
-
-// Get parameters from URL
-const { lang, type, slug } = Astro.params;
-
-// Construct file path
+// Build content path safely
 const contentDir = path.join(process.cwd(), 'src', 'content', type, lang);
-const filePath = path.join(contentDir, `${slug}.md`);
+const filePath = path.join(contentDir, ...slugArray.filter(Boolean));
 
-// Read markdown file
+// Read markdown safely
 let frontmatter = {};
 let content = '';
 
-try {
+if (fs.existsSync(filePath)) {
   const fileContent = fs.readFileSync(filePath, 'utf-8');
-
-  // Extract frontmatter
   const frontmatterMatch = fileContent.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
-
   if (frontmatterMatch) {
     const frontmatterText = frontmatterMatch[1];
     content = frontmatterMatch[2];
-
-    // Parse frontmatter (simple parser)
     frontmatterText.split('\n').forEach(line => {
       const [key, ...valueParts] = line.split(':');
       if (key && valueParts.length > 0) {
-        const value = valueParts.join(':').trim().replace(/^["']|["']$/g, '');
-        frontmatter[key.trim()] = value;
+        frontmatter[key.trim()] = valueParts.join(':').trim().replace(/^["']|["']$/g, '');
       }
     });
   }
-} catch (error) {
-  return Astro.redirect('/404');
+} else {
+  // fallback if file missing
+  console.warn(`Markdown file not found: ${filePath}`);
 }
 ---
-
 <BlogLayout
-  title={frontmatter.title}
-  description={frontmatter.description}
-  publishedAt={frontmatter.publishedAt}
-  imageUrl={frontmatter.imageUrl}
+  title={frontmatter.title || "Untitled"}
+  description={frontmatter.description || ""}
+  publishedAt={frontmatter.publishedAt || ""}
+  imageUrl={frontmatter.imageUrl || ""}
   language={lang}
 >
   <article set:html={content} />
