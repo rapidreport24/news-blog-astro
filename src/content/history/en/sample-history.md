@@ -1,8 +1,8 @@
 ---
-title: "Sample Article Title"
-description: "This is a sample description for testing."
+title: "Sample History Article (EN)"
+description: "This is a sample history article in English."
 publishedAt: "2026-01-12"
-imageUrl: "/images/sample.jpg"
+imageUrl: "/images/sample-history-en.jpg"
 ---
 
-This is the **body of the sample article**. You can write anything here.
+This is the **body of the sample English history article**. Use this to test your blog’s history section.

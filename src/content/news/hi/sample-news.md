@@ -1,8 +1,8 @@
 ---
-title: "Sample Article Title"
-description: "This is a sample description for testing."
+title: "नमूना समाचार लेख (HI)"
+description: "यह हिंदी में एक नमूना समाचार लेख है।"
 publishedAt: "2026-01-12"
-imageUrl: "/images/sample.jpg"
+imageUrl: "/images/sample-news-hi.jpg"
 ---
 
-This is the **body of the sample article**. You can write anything here.
+यह **हिंदी में नमूना समाचार लेख का मुख्य भाग** है। इसे परीक्षण के लिए उपयोग करें।
