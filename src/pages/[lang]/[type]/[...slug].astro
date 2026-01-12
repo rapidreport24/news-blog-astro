@@ -1,0 +1,161 @@
+---
+import BlogLayout from "../../../layouts/BlogLayout.astro";
+import fs from "fs";
+import path from "path";
+
+/* -------------------------------------------
+   1. Generate all static routes automatically
+   -------------------------------------------- */
+export async function getStaticPaths() {
+  const contentRoot = path.join(process.cwd(), "src", "content");
+
+  // Check if content directory exists
+  if (!fs.existsSync(contentRoot)) {
+    console.warn("Content directory not found, returning empty paths");
+    return [];
+  }
+
+  const types = fs.readdirSync(contentRoot);
+  const paths = [];
+
+  for (const type of types) {
+    const typeDir = path.join(contentRoot, type);
+    if (!fs.statSync(typeDir).isDirectory()) continue;
+
+    const langs = fs.readdirSync(typeDir);
+
+    for (const lang of langs) {
+      const langDir = path.join(typeDir, lang);
+      if (!fs.statSync(langDir).isDirectory()) continue;
+
+      const files = fs.readdirSync(langDir);
+
+      for (const file of files) {
+        if (!file.endsWith(".md")) continue;
+
+        const slug = file.replace(".md", "");
+
+        paths.push({
+          params: {
+            lang,
+            type,
+            slug: slug,
+          },
+        });
+      }
+    }
+  }
+
+  console.log(`Generated ${paths.length} static paths`);
+  return paths;
+}
+
+/* -------------------------------------------
+   2. Read params from URL
+   -------------------------------------------- */
+const { lang, type, slug } = Astro.params;
+
+/* -------------------------------------------
+   3. Load markdown file
+   -------------------------------------------- */
+const filePath = path.join(
+  process.cwd(),
+  "src",
+  "content",
+  type,
+  lang,
+  `${slug}.md`
+);
+
+let frontmatter = {
+  title: "Article Not Found",
+  description: "",
+  publishedAt: new Date().toISOString(),
+  imageUrl: "",
+  category: "general",
+};
+let htmlContent = "<p>Article content not available.</p>";
+
+try {
+  const fileData = fs.readFileSync(filePath, "utf-8");
+  const match = fileData.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+
+  if (match) {
+    const fmText = match[1];
+    const markdownContent = match[2];
+
+    // Parse frontmatter
+    const parsedFrontmatter = {};
+    fmText.split("\n").forEach((line) => {
+      const colonIndex = line.indexOf(":");
+      if (colonIndex > 0) {
+        const key = line.substring(0, colonIndex).trim();
+        const value = line
+          .substring(colonIndex + 1)
+          .trim()
+          .replace(/^["']|["']$/g, "");
+        parsedFrontmatter[key] = value;
+      }
+    });
+
+    // Update frontmatter
+    frontmatter = {
+      title: parsedFrontmatter.title || frontmatter.title,
+      description: parsedFrontmatter.description || frontmatter.description,
+      publishedAt: parsedFrontmatter.publishedAt || frontmatter.publishedAt,
+      imageUrl: parsedFrontmatter.imageUrl || frontmatter.imageUrl,
+      category: parsedFrontmatter.category || frontmatter.category,
+    };
+
+    // Convert markdown to HTML (basic conversion)
+    htmlContent = markdownContent
+      .split("\n\n")
+      .filter((para) => para.trim())
+      .map((para) => {
+        // Handle headings
+        if (para.startsWith("# ")) {
+          return `<h1>${para.substring(2)}</h1>`;
+        } else if (para.startsWith("## ")) {
+          return `<h2>${para.substring(3)}</h2>`;
+        } else if (para.startsWith("### ")) {
+          return `<h3>${para.substring(4)}</h3>`;
+        }
+        // Handle images
+        else if (para.match(/!\[.*?\]\(.*?\)/)) {
+          const imgMatch = para.match(/!\[(.*?)\]\((.*?)\)/);
+          if (imgMatch) {
+            return `<img src="${imgMatch[2]}" alt="${imgMatch[1]}" style="max-width: 100%; height: auto; border-radius: 8px; margin: 1.5rem 0;">`;
+          }
+        }
+        // Handle ordered lists
+        else if (para.match(/^\d+\.\s/)) {
+          const items = para
+            .split("\n")
+            .map((line) => {
+              const match = line.match(/^\d+\.\s(.+)$/);
+              return match ? `<li>${match[1]}</li>` : "";
+            })
+            .filter((item) => item)
+            .join("\n");
+          return `<ol>${items}</ol>`;
+        }
+        // Regular paragraphs
+        return `<p>${para.replace(/\n/g, "<br>")}</p>`;
+      })
+      .join("\n");
+  }
+} catch (err) {
+  console.error(`Error loading article: ${filePath}`, err.message);
+}
+---
+
+<BlogLayout
+  title={frontmatter.title}
+  description={frontmatter.description}
+  publishedAt={frontmatter.publishedAt}
+  imageUrl={frontmatter.imageUrl}
+  language={lang}
+  category={frontmatter.category}
+>
+  <article set:html={htmlContent} />
+</BlogLayout>

@@ -1,12 +1,11 @@
-import { defineConfig } from 'astro/config';
-import sitemap from '@astrojs/sitemap';
+import { defineConfig } from "astro/config";
 
 export default defineConfig({
-  site: 'https://YOUR_SITE_NAME.netlify.app', // Update after Netlify deployment
-  integrations: [sitemap()],
+  site: "https://example.com", // keep valid URL; replace after Netlify gives final URL
+  output: "static",
   markdown: {
     shikiConfig: {
-      theme: 'github-light',
+      theme: "github-light",
     },
   },
 });
