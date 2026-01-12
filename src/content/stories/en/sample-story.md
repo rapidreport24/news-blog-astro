@@ -1,8 +1,10 @@
 ---
-title: "Sample Story (EN)"
-description: "This is a sample story article in English."
+title: "Sample Story (English)"
+description: "This is a sample story in English."
 publishedAt: "2026-01-12"
-imageUrl: "/images/sample-story-en.jpg"
+imageUrl: "/images/story-en.jpg"
 ---
 
-This is the **body of the sample English story article**. It can contain paragraphs, lists, or any markdown content.
+# Sample Story (EN)
+
+Once upon a time, there was a sample story written in English for your blog.

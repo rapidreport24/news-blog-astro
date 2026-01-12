@@ -1,8 +1,10 @@
 ---
-title: "Sample History Article (EN)"
+title: "Sample History Article (English)"
 description: "This is a sample history article in English."
 publishedAt: "2026-01-12"
-imageUrl: "/images/sample-history-en.jpg"
+imageUrl: "/images/history-en.jpg"
 ---
 
-This is the **body of the sample English history article**. Use this to test your blog’s history section.
+# Sample History Article (EN)
+
+This is a sample history article written in English to fill your content folder.
