@@ -1,7 +1,7 @@
 import { defineConfig } from "astro/config";
 
 export default defineConfig({
-  site: "https://example.com", // keep valid URL; replace after Netlify gives final URL
+  site: "https://rapidreport247.netlify.app",
   output: "static",
   markdown: {
     shikiConfig: {
