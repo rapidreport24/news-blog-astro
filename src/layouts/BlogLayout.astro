@@ -1,3 +1,4 @@
+
 ---
 const { title, description, publishedAt, imageUrl, language, category } = Astro.props;
 const currentUrl = Astro.url.href;
@@ -10,24 +11,24 @@ const currentUrl = Astro.url.href;
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{title}</title>
   <meta name="description" content={description}>
-
+  
   <!-- Open Graph -->
   <meta property="og:type" content="article">
   <meta property="og:url" content={currentUrl}>
   <meta property="og:title" content={title}>
   <meta property="og:description" content={description}>
   <meta property="og:image" content={imageUrl}>
-
+  
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image">
   <meta property="twitter:url" content={currentUrl}>
   <meta property="twitter:title" content={title}>
   <meta property="twitter:description" content={description}>
   <meta property="twitter:image" content={imageUrl}>
-
+  
   <!-- Canonical -->
   <link rel="canonical" href={currentUrl}>
-
+  
   <style>
     * {
       margin: 0;
@@ -35,22 +36,86 @@ const currentUrl = Astro.url.href;
       box-sizing: border-box;
     }
 
+    :root {
+      --primary-blue: #007bff;
+      --primary-dark: #0056b3;
+      --text-dark: #222;
+      --text-gray: #666;
+      --bg-white: #fff;
+      --bg-light: #f8f9fa;
+      --shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
       line-height: 1.7;
-      color: #333;
-      background: #f9f9f9;
+      color: var(--text-dark);
+      background: var(--bg-light);
+    }
+
+    .header {
+      position: sticky;
+      top: 0;
+      background: var(--bg-white);
+      box-shadow: var(--shadow);
+      z-index: 1000;
+      padding: 0.8rem 0;
+    }
+
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--primary-blue);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .back-btn {
+      padding: 0.5rem 1rem;
+      background: var(--primary-blue);
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+
+    .back-btn:hover {
+      background: var(--primary-dark);
+    }
+
+    .ad-banner-top {
+      background: var(--bg-white);
+      border: 2px dashed #ddd;
+      border-radius: 8px;
+      padding: 60px 20px;
+      text-align: center;
+      color: var(--text-gray);
+      margin: 1rem auto;
+      max-width: 1200px;
+      min-height: 100px;
     }
 
     .container {
       max-width: 800px;
       margin: 0 auto;
-      padding: 20px;
-      background: white;
+      padding: 2rem 1rem;
+      background: var(--bg-white);
       min-height: 100vh;
     }
 
-    .header {
+    .article-header {
       text-align: center;
       padding: 2rem 0;
       border-bottom: 2px solid #eee;
@@ -58,32 +123,99 @@ const currentUrl = Astro.url.href;
 
     .category-badge {
       display: inline-block;
-      background: #007bff;
+      background: var(--primary-blue);
       color: white;
-      padding: 4px 12px;
+      padding: 6px 16px;
       border-radius: 20px;
       font-size: 0.85rem;
       text-transform: uppercase;
+      font-weight: 600;
       margin-bottom: 1rem;
+      letter-spacing: 0.5px;
     }
 
     h1 {
-      font-size: 2.2rem;
+      font-size: 2rem;
       margin-bottom: 1rem;
-      color: #222;
+      color: var(--text-dark);
+      line-height: 1.3;
+      font-weight: 700;
     }
 
     .meta {
-      color: #666;
+      color: var(--text-gray);
       font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
     }
 
     .featured-image {
       width: 100%;
-      max-height: 400px;
+      max-height: 450px;
       object-fit: cover;
       border-radius: 12px;
       margin: 2rem 0;
+      box-shadow: var(--shadow);
+    }
+
+    .share-buttons {
+      display: flex;
+      gap: 0.8rem;
+      justify-content: center;
+      margin: 1.5rem 0;
+    }
+
+    .share-btn {
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .share-facebook {
+      background: #1877f2;
+      color: white;
+    }
+
+    .share-twitter {
+      background: #1da1f2;
+      color: white;
+    }
+
+    .share-whatsapp {
+      background: #25d366;
+      color: white;
+    }
+
+    .share-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .ad-slot {
+      background: var(--bg-light);
+      padding: 40px 20px;
+      text-align: center;
+      margin: 2rem 0;
+      border-radius: 8px;
+      border: 2px dashed #ddd;
+      color: var(--text-gray);
+      min-height: 280px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ad-in-content {
+      margin: 2.5rem 0;
     }
 
     .content {
@@ -93,12 +225,24 @@ const currentUrl = Astro.url.href;
 
     .content p {
       margin-bottom: 1.5rem;
+      text-align: justify;
     }
 
-    .content h1, .content h2, .content h3 {
+    .content h1,
+    .content h2,
+    .content h3 {
       margin-top: 2rem;
       margin-bottom: 1rem;
-      color: #222;
+      color: var(--text-dark);
+      line-height: 1.4;
+    }
+
+    .content h2 {
+      font-size: 1.6rem;
+    }
+
+    .content h3 {
+      font-size: 1.3rem;
     }
 
     .content img {
@@ -106,80 +250,293 @@ const currentUrl = Astro.url.href;
       height: auto;
       border-radius: 8px;
       margin: 1.5rem 0;
+      box-shadow: var(--shadow);
     }
 
-    .content ol {
+    .content ol,
+    .content ul {
       margin-left: 2rem;
       margin-bottom: 1.5rem;
     }
 
-    .content ol li {
-      margin-bottom: 0.5rem;
+    .content ol li,
+    .content ul li {
+      margin-bottom: 0.8rem;
     }
 
-    .ad-slot {
-      background: #f5f5f5;
-      padding: 40px 20px;
-      text-align: center;
-      margin: 2rem 0;
-      border-radius: 8px;
-      border: 2px dashed #ddd;
-      color: #999;
-    }
-
-    footer {
+    .related-section {
       margin-top: 3rem;
       padding-top: 2rem;
-      border-top: 1px solid #eee;
-      text-align: center;
-      color: #666;
-      font-size: 0.9rem;
+      border-top: 2px solid #eee;
     }
 
-    @media (max-width: 768px) {
+    .related-title {
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      color: var(--text-dark);
+    }
+
+    .scroll-top {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      width: 50px;
+      height: 50px;
+      background: var(--primary-blue);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 900;
+      transition: all 0.3s;
+    }
+
+    .scroll-top.visible {
+      display: flex;
+    }
+
+    .scroll-top:hover {
+      transform: scale(1.1);
+    }
+
+    .sticky-bottom-ad {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--bg-white);
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+      padding: 10px;
+      text-align: center;
+      z-index: 800;
+      display: block;
+    }
+
+    .sticky-bottom-ad-close {
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-gray);
+    }
+
+    .footer {
+      background: var(--bg-light);
+      padding: 2rem 1rem;
+      margin-top: 3rem;
+      border-top: 1px solid #dee2e6;
+      text-align: center;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .footer-links a {
+      color: var(--text-gray);
+      text-decoration: none;
+      font-size: 0.95rem;
+    }
+
+    .footer-links a:hover {
+      color: var(--primary-blue);
+    }
+
+    body.dark-mode {
+      background: #1a1a1a;
+      color: #e0e0e0;
+    }
+
+    body.dark-mode .header,
+    body.dark-mode .container,
+    body.dark-mode .sticky-bottom-ad {
+      background: #2d2d2d;
+    }
+
+    body.dark-mode .ad-slot,
+    body.dark-mode .ad-banner-top {
+      background: #1a1a1a;
+      border-color: #444;
+    }
+
+    body.dark-mode .footer {
+      background: #2d2d2d;
+    }
+
+    @media (min-width: 768px) {
       h1 {
-        font-size: 1.5rem;
+        font-size: 2.5rem;
       }
+
+      .sticky-bottom-ad {
+        display: none;
+      }
+    }
+
+    @media (max-width: 767px) {
+      h1 {
+        font-size: 1.6rem;
+      }
+
       .content {
         font-size: 1rem;
+      }
+
+      .container {
+        padding-bottom: 100px;
       }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <div class="category-badge">{category}</div>
-      <h1>{title}</h1>
-      <div class="meta">
-        Published: {new Date(publishedAt).toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        })}
-      </div>
+  <header class="header">
+    <div class="header-container">
+      <a href="/" class="logo">
+        <span>📰</span>
+        <span>RapidReport24</span>
+      </a>
+      <a href="/" class="back-btn">← Back</a>
     </div>
+  </header>
 
-    {imageUrl && <img src={imageUrl} alt={title} class="featured-image" />}
-
-    <!-- Ad Slot 1 -->
-    <div class="ad-slot">
-      <p>[Advertisement Space 1]</p>
-    </div>
-
-    <div class="content">
-      <slot />
-    </div>
-
-    <!-- Ad Slot 2 -->
-    <div class="ad-slot">
-      <p>[Advertisement Space 2]</p>
-    </div>
-
-    <footer>
-      <p>&copy; 2026 Your News Platform. All rights reserved.</p>
-      <p style="margin-top: 0.5rem;">Auto-generated content powered by AI</p>
-    </footer>
+  <!-- Top Banner Ad Below Header -->
+  <div class="ad-banner-top">
+    <!-- Google AdSense Top Banner -->
+    <div>Advertisement</div>
   </div>
+
+  <div class="container">
+    <article>
+      <div class="article-header">
+        <div class="category-badge">{category}</div>
+        <h1>{title}</h1>
+        <div class="meta">
+          <span>📅</span>
+          <span>{new Date(publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+        </div>
+      </div>
+
+      {imageUrl && (
+        <img src={imageUrl} alt={title} class="featured-image" loading="lazy" />
+      )}
+
+      <div class="share-buttons">
+        <button class="share-btn share-facebook" onclick="shareOnFacebook()">
+          <span>📘</span> Share
+        </button>
+        <button class="share-btn share-twitter" onclick="shareOnTwitter()">
+          <span>🐦</span> Tweet
+        </button>
+        <button class="share-btn share-whatsapp" onclick="shareOnWhatsApp()">
+          <span>💬</span> WhatsApp
+        </button>
+      </div>
+
+      <!-- Ad Slot After Featured Image -->
+      <div class="ad-slot ad-in-content">
+        <!-- Google AdSense In-Content Ad #1 -->
+        <div>Advertisement</div>
+      </div>
+
+      <div class="content">
+        <slot />
+      </div>
+
+      <!-- Mid Content Ad -->
+      <div class="ad-slot ad-in-content">
+        <!-- Google AdSense In-Content Ad #2 -->
+        <div>Advertisement</div>
+      </div>
+
+      <!-- End of Article Ad -->
+      <div class="ad-slot">
+        <!-- Google AdSense End Article Ad -->
+        <div>Advertisement</div>
+      </div>
+    </article>
+
+    <div class="related-section">
+      <h2 class="related-title">Related Articles</h2>
+      <!-- Related articles will be populated here -->
+    </div>
+  </div>
+
+  <!-- Sticky Bottom Mobile Ad -->
+  <div class="sticky-bottom-ad" id="stickyAd">
+    <button class="sticky-bottom-ad-close" onclick="closeStickyAd()">×</button>
+    <!-- Google AdSense Sticky Bottom Ad -->
+    <div style="min-height: 50px;">Mobile Advertisement</div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="/">Home</a>
+      <a href="/about">About Us</a>
+      <a href="/privacy">Privacy Policy</a>
+      <a href="/contact">Contact Us</a>
+    </div>
+    <p>&copy; 2026 RapidReport24. All rights reserved.</p>
+  </footer>
+
+  <button class="scroll-top" id="scrollTop" aria-label="Scroll to top">
+    ↑
+  </button>
+
+  <script>
+    // Scroll to top button
+    const scrollTopBtn = document.getElementById('scrollTop');
+    
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 500) {
+        scrollTopBtn.classList.add('visible');
+      } else {
+        scrollTopBtn.classList.remove('visible');
+      }
+    });
+
+    scrollTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Close sticky ad
+    function closeStickyAd() {
+      document.getElementById('stickyAd').style.display = 'none';
+    }
+
+    // Share functions
+    function shareOnFacebook() {
+      const url = encodeURIComponent(window.location.href);
+      window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank', 'width=600,height=400');
+    }
+
+    function shareOnTwitter() {
+      const url = encodeURIComponent(window.location.href);
+      const text = encodeURIComponent(document.querySelector('h1').textContent);
+      window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank', 'width=600,height=400');
+    }
+
+    function shareOnWhatsApp() {
+      const url = encodeURIComponent(window.location.href);
+      const text = encodeURIComponent(document.querySelector('h1').textContent);
+      window.open(`https://wa.me/?text=${text}%20${url}`, '_blank');
+    }
+
+    // Dark mode support
+    if (localStorage.getItem('darkMode') === 'enabled') {
+      document.body.classList.add('dark-mode');
+    }
+  </script>
 </body>
 </html>
