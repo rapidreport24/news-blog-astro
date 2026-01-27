@@ -1,40 +1,336 @@
 ---
-import { readdir } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 
 const dir = path.join(process.cwd(), "src", "content", "news", "hi");
+let articles = [];
 
-let slugs = [];
 try {
   const files = await readdir(dir);
-  slugs = files
-    .filter((f) => f.endsWith(".md"))
-    .map((f) => f.replace(/\.md$/, ""))
-    .sort()
-    .reverse();
-} catch (_) {
-  slugs = [];
+  const mdFiles = files.filter((f) => f.endsWith(".md"));
+  
+  for (const file of mdFiles) {
+    const filePath = path.join(dir, file);
+    const content = await readFile(filePath, "utf-8");
+    const match = content.match(/^---\n([\s\S]*?)\n---/);
+    
+    if (match) {
+      const frontmatter = {};
+      match[1].split("\n").forEach((line) => {
+        const colonIndex = line.indexOf(":");
+        if (colonIndex > 0) {
+          const key = line.substring(0, colonIndex).trim();
+          const value = line.substring(colonIndex + 1).trim().replace(/^["']|["']$/g, "");
+          frontmatter[key] = value;
+        }
+      });
+      
+      articles.push({
+        slug: file.replace(".md", ""),
+        title: frontmatter.title || "शीर्षकहीन",
+        description: frontmatter.description || "",
+        imageUrl: frontmatter.imageUrl || "/placeholder.jpg",
+        publishedAt: frontmatter.publishedAt || new Date().toISOString(),
+        category: frontmatter.category || "समाचार"
+      });
+    }
+  }
+  
+  articles.sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt));
+} catch (err) {
+  console.log("No articles found:", err.message);
 }
 ---
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="hi">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>हिंदी समाचार</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>हिंदी समाचार - RapidReport24</title>
+  <meta name="description" content="RapidReport24 से नवीनतम हिंदी समाचार">
+  <link rel="canonical" href="https://yoursite.com/news/hi">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans Devanagari', sans-serif;
+      background: #f8f9fa;
+      color: #222;
+      line-height: 1.6;
+    }
+
+    .header {
+      position: sticky;
+      top: 0;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      z-index: 1000;
+      padding: 0.8rem 0;
+    }
+
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #007bff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .back-btn {
+      padding: 0.5rem 1rem;
+      background: #007bff;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+
+    .back-btn:hover {
+      background: #0056b3;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    .page-title {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      color: #222;
+    }
+
+    .page-subtitle {
+      color: #666;
+      margin-bottom: 2rem;
+      font-size: 1.1rem;
+    }
+
+    .ad-banner {
+      background: #fff;
+      border: 2px dashed #ddd;
+      border-radius: 8px;
+      padding: 60px 20px;
+      text-align: center;
+      color: #999;
+      margin-bottom: 2rem;
+      min-height: 100px;
+    }
+
+    .articles-grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .article-card {
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      display: flex;
+      text-decoration: none;
+      color: #222;
+      transition: all 0.3s;
+    }
+
+    .article-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+
+    .article-image {
+      width: 180px;
+      height: 180px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .article-content {
+      padding: 1.2rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .article-category {
+      display: inline-block;
+      background: #007bff;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+      width: fit-content;
+      font-weight: 600;
+    }
+
+    .article-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #222;
+      line-height: 1.4;
+    }
+
+    .article-desc {
+      color: #666;
+      font-size: 0.95rem;
+      margin-bottom: 0.8rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .article-date {
+      color: #999;
+      font-size: 0.85rem;
+      margin-top: auto;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 4rem 1rem;
+      color: #666;
+    }
+
+    .empty-state h2 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      color: #222;
+    }
+
+    .footer {
+      background: #fff;
+      padding: 2rem 1rem;
+      margin-top: 3rem;
+      border-top: 1px solid #dee2e6;
+      text-align: center;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .footer-links a {
+      color: #666;
+      text-decoration: none;
+      font-size: 0.95rem;
+    }
+
+    .footer-links a:hover {
+      color: #007bff;
+    }
+
+    @media (max-width: 768px) {
+      .article-card {
+        flex-direction: column;
+      }
+
+      .article-image {
+        width: 100%;
+        height: 200px;
+      }
+
+      .page-title {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
 </head>
-<body style="font-family: system-ui; max-width: 900px; margin: 0 auto; padding: 20px;">
-  <h1>हिंदी समाचार</h1>
+<body>
+  <header class="header">
+    <div class="header-container">
+      <a href="/" class="logo">
+        <span>📰</span>
+        <span>RapidReport24</span>
+      </a>
+      <a href="/" class="back-btn">← होम</a>
+    </div>
+  </header>
 
-  {slugs.length === 0 ? (
-    <p>अभी कोई पोस्ट नहीं है। (Cloud Functions जल्द ही markdown push करेगा।)</p>
-  ) : (
-    <ul>
-      {slugs.map((s) => <li><a href={`/hi/news/${s}/`}>{s}</a></li>)}
-    </ul>
-  )}
+  <div class="container">
+    <h1 class="page-title">📰 हिंदी समाचार</h1>
+    <p class="page-subtitle">नवीनतम ब्रेकिंग न्यूज़ और अपडेट</p>
 
-  <p><a href="/">← Home</a></p>
+    <div class="ad-banner">
+      <!-- Google AdSense Banner -->
+      <div>विज्ञापन</div>
+    </div>
+
+    {articles.length === 0 ? (
+      <div class="empty-state">
+        <h2>अभी कोई समाचार नहीं</h2>
+        <p>नए लेख जल्द ही यहां दिखाई देंगे। बाद में वापस आएं!</p>
+      </div>
+    ) : (
+      <div class="articles-grid">
+        {articles.map((article, index) => (
+          <>
+            <a href={`/news/hi/${article.slug}`} class="article-card">
+              <img 
+                src={article.imageUrl} 
+                alt={article.title} 
+                class="article-image"
+                loading="lazy"
+              />
+              <div class="article-content">
+                <span class="article-category">{article.category}</span>
+                <h2 class="article-title">{article.title}</h2>
+                <p class="article-desc">{article.description}</p>
+                <div class="article-date">
+                  📅 {new Date(article.publishedAt).toLocaleDateString('hi-IN', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                  })}
+                </div>
+              </div>
+            </a>
+
+            {(index + 1) % 4 === 0 && (
+              <div class="ad-banner">
+                <div>विज्ञापन</div>
+              </div>
+            )}
+          </>
+        ))}
+      </div>
+    )}
+  </div>
+
+  <footer class="footer">
+    <div class="footer-links">
+      <a href="/">होम</a>
+      <a href="/about">हमारे बारे में</a>
+      <a href="/privacy">गोपनीयता नीति</a>
+      <a href="/contact">संपर्क करें</a>
+    </div>
+    <p>&copy; 2026 RapidReport24. सर्वाधिकार सुरक्षित।</p>
+  </footer>
 </body>
 </html>
